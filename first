@@ -1,0 +1,39 @@
+#!/urs/bin/perl
+#use strict;
+#use warnings;
+use Smart::Comments;
+use Getopt::Long;
+GetOptions(
+    'g=s' => \$gene_query_name,
+    'id=s' => \$gene_id,
+    );
+die "perl querygene2pathid.pl -g <gene> or -id <gene_id>" unless $gene_query_name or $gene_id;
+open KEGG,'/disk2/mygeno/chengsb/practice/9.11/practice/hsa.keg';
+$gene_query_name=uc($gene_query_name);
+while(<KEGG>){
+chomp;
+if (/^C/){
+/\d+\s+(.*?)\[PATH:hsa(\d+)\]/i;
+$path=$1;
+chop $path;
+$path_id=$2;
+}
+if (/^D/){
+/^D\s+(\d+)(.*?);/;
+$gene_name=$2;
+$tem=$1;
+$gene_name=~s/^\s//;
+$gene{$gene_name}{$path_id}=$path;
+next if $gen_id;
+$gene_query_name=$gene_name if $gene_id && $gene_id eq $tem;
+
+$gen_id=$tem if uc($gene_query_name) eq uc($gene_name);
+}
+}
+die "未找到该基因\n" unless $gen_id;
+print "path_id\tgene_id\tsymbol\tpath_name\n";
+for (sort keys %{$gene{$gene_query_name}}){
+print "$_\t$gen_id\t$gene_query_name\t$gene{$gene_query_name}{$_}\n";
+}
+
+
